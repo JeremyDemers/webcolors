@@ -26,6 +26,7 @@ def _reversedict(d: dict) -> dict:
 
 HEX_COLOR_RE = re.compile(r"^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$")
 
+COLOR_HEXA = "color_hexa"
 HTML4 = "html4"
 CSS2 = "css2"
 CSS21 = "css21"
@@ -46,7 +47,6 @@ HTML5SimpleColor = NamedTuple(
 
 IntTuple = Union[IntegerRGB, HTML5SimpleColor, Tuple[int, int, int]]
 PercentTuple = Union[PercentRGB, Tuple[str, str, str]]
-
 
 # Mappings of color names to normalized hexadecimal color values.
 #################################################################
@@ -255,6 +255,10 @@ CSS3_NAMES_TO_HEX = {
     "yellowgreen": "#9acd32",
 }
 
+# The COLOR_HEXA named colors.
+#
+# The canonical source for these color definitions is the list
+# of colors located at:
 # https://www.colorhexa.com/color-names
 COLOR_HEXA_NAMES_TO_HEX = {
     'Air Force Blue (Usaf)': '#00308f',
@@ -1123,7 +1127,6 @@ COLOR_HEXA_NAMES_TO_HEX = {
     'Zinnwaldite Brown': '#2c1608'
 }
 
-
 # Mappings of normalized hexadecimal color values to color names.
 #################################################################
 
@@ -1135,7 +1138,7 @@ CSS21_HEX_TO_NAMES = _reversedict(CSS21_NAMES_TO_HEX)
 
 CSS3_HEX_TO_NAMES = _reversedict(CSS3_NAMES_TO_HEX)
 
-COLOR_HEXA_NAMES_TO_HEX = _reversedict(COLOR_HEXA_NAMES_TO_HEX)
+COLOR_HEXA_HEX_TO_NAMES = _reversedict(COLOR_HEXA_NAMES_TO_HEX)
 
 # CSS3 defines both 'gray' and 'grey', as well as defining either
 # variant for other related colors like 'darkgray'/'darkgrey'. For a
@@ -1242,6 +1245,7 @@ def name_to_hex(name: str, spec: str = CSS3) -> str:
         CSS21: CSS21_NAMES_TO_HEX,
         CSS3: CSS3_NAMES_TO_HEX,
         HTML4: HTML4_NAMES_TO_HEX,
+        COLOR_HEXA: COLOR_HEXA_NAMES_TO_HEX,
     }[spec].get(normalized)
     if hex_value is None:
         raise ValueError(
@@ -1295,6 +1299,7 @@ def hex_to_name(hex_value: str, spec: str = CSS3) -> str:
         CSS21: CSS21_HEX_TO_NAMES,
         CSS3: CSS3_HEX_TO_NAMES,
         HTML4: HTML4_HEX_TO_NAMES,
+        COLOR_HEXA: COLOR_HEXA_HEX_TO_NAMES,
     }[spec].get(normalized)
     if name is None:
         raise ValueError("'{}' has no defined color name in {}".format(hex_value, spec))
@@ -1563,9 +1568,9 @@ def html5_parse_legacy_color(input: str) -> HTML5SimpleColor:
     #    characters of input are all ASCII hex digits, then run these
     #    substeps:
     if (
-        len(input) == 4
-        and input.startswith("#")
-        and all(c in string.hexdigits for c in input[1:])
+            len(input) == 4
+            and input.startswith("#")
+            and all(c in string.hexdigits for c in input[1:])
     ):
         # 1. Let result be a simple color.
         #
@@ -1617,13 +1622,13 @@ def html5_parse_legacy_color(input: str) -> HTML5SimpleColor:
     #     components (one third the length of input).
     length = int(len(input) / 3)
     red = input[:length]
-    green = input[length : length * 2]
-    blue = input[length * 2 :]
+    green = input[length: length * 2]
+    blue = input[length * 2:]
 
     # 13. If length is greater than 8, then remove the leading
     #     length-8 characters in each component, and let length be 8.
     if length > 8:
-        red, green, blue = (red[length - 8 :], green[length - 8 :], blue[length - 8 :])
+        red, green, blue = (red[length - 8:], green[length - 8:], blue[length - 8:])
         length = 8
 
     # 14. While length is greater than two and the first character in
