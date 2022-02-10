@@ -39,3 +39,9 @@ serialization algorithms. For example, parsing the infamous
     HTML5SimpleColor(red=192, green=0, blue=0)
 
 Full documentation is `available online <https://webcolors.readthedocs.io/>`_.
+
+10-Feb-2022
+Added:
+COLOR_HEXA_NAMES_TO_HEX which you can use the same as CSS3_NAMES_TO_HEX. 
+The difference is COLOR_HEXA_NAMES_TO_HEX has 864 name mappings vs CSS3_NAMES_TO_HEX's
+146 name mappings. 
